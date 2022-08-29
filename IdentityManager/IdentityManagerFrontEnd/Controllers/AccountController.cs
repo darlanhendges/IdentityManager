@@ -68,6 +68,7 @@ namespace IdentityManagerFrontEnd.Controllers
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
+
         [HttpGet]
         public IActionResult Login(string returnUrl=null)
         {
@@ -108,7 +109,12 @@ namespace IdentityManagerFrontEnd.Controllers
         {
             return View();
         }
-
-
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            return View(model);
+        }
     }
 }
