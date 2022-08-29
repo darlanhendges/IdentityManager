@@ -88,6 +88,10 @@ namespace IdentityManagerFrontEnd.Controllers
                 {
                     return Redirect(returnUrl);
                 }
+                if (result.IsLockedOut)
+                {
+                    return View("Lockout");
+                }
                 else
                 {
                     ModelState.AddModelError(String.Empty, "Invalid login attempt.");
