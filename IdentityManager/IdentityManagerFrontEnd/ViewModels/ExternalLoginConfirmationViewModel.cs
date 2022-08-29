@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace IdentityManagerFrontEnd.ViewModels
 {
-    public class ForgotPasswordViewModel
+    public class ExternalLoginConfirmationViewModel
     {
         [Required]
         [EmailAddress]
         public string Email { get; set; }
 
+        public string Name { get; set; }
     }
 }
