@@ -9,9 +9,13 @@
 <p>
     Alternatively, scan the below QRCode with your mobile phone.
 </p>
+
 <div id="qrCode"></div>
 
 <form method="post">
+    
+    <div asp-validation-summary="All" class="text-danger"></div>
+
     <input hidden asp-for="Token" />
     <div class="form-group">
         Enter Code : <input type="text" class="form-control" asp-for="Code" />
