@@ -47,11 +47,11 @@
             </p>
         </form>
     </div>
-   @* @{
+    @{
         var schemes = await signInManager.GetExternalAuthenticationSchemesAsync();
-        var loginProivders = schemes.ToList();
+        var loginProviders = schemes.ToList();
     }
-    @if (loginProivders.Count() > 0)
+    @if (loginProviders.Count() > 0)
     {
         <div class="col-md-4">
             <section>
@@ -59,7 +59,7 @@
                 <form asp-controller="Account" asp-action="ExternalLogin" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post" role="form">
                     <div>
                         <p>
-                            @foreach (var provider in loginProivders)
+                            @foreach (var provider in loginProviders)
                             {
                                 <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name"
                                 title="Log in using your @provider.Name account">
@@ -71,7 +71,7 @@
                 </form>
             </section>
         </div>
-    }*@
+    }
 </div>
 
 

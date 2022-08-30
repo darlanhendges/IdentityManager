@@ -1,8 +1,6 @@
 using IdentityManagerFrontEnd.Data;
 using IdentityManagerFrontEnd.Installers;
 using IdentityManagerFrontEnd.Services;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,14 +8,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+
+DbInstaller.Install(builder.Services, builder.Configuration.GetConnectionString("DefaultConnection"));
 
 IdentityInstaller.Install(builder.Services);
 
-builder.Services.AddTransient<IEmailSender, MailJetEmailSender>();
+FacebookInstaller.Install(builder.Services, builder.Configuration.GetSection("Facebook").Get<FacebookOptions>());
+
+ServiceInstaller.Install(builder.Services);
 
 var app = builder.Build();
 
