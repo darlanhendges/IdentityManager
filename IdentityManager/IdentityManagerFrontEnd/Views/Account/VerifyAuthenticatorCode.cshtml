@@ -1,6 +1,6 @@
 ﻿@model VerifyAuthenticatorViewModel
 
-<h1>Verfiy Authenticator Code</h1>
+<h1>Verifiy Authenticator Code</h1>
 
 <form asp-controller="Account" asp-action="VerifyAuthenticatorCode" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" role="form">
     <div asp-validation-summary="All" class="text-danger"></div>
@@ -21,5 +21,7 @@
 </form>
 
 @section Scripts{
-    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

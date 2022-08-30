@@ -130,11 +130,14 @@ namespace IdentityManagerFrontEnd.Controllers
             returnUrl = returnUrl ?? Url.Content("~/");
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, true);
-
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
                     return LocalRedirect(returnUrl);
+                }
+                if (result.RequiresTwoFactor)
+                {
+                    return RedirectToAction(nameof(VerifyAuthenticatorCode), new { returnUrl, model.RememberMe });
                 }
                 if (result.IsLockedOut)
                 {
@@ -142,11 +145,11 @@ namespace IdentityManagerFrontEnd.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError(String.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return View(model);
-
                 }
             }
+
 
             return View(model);
         }
@@ -409,6 +412,15 @@ namespace IdentityManagerFrontEnd.Controllers
                 return View(model);
             }
 
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RemoveAuthenticator()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            await _userManager.ResetAuthenticatorKeyAsync(user);
+            await _userManager.SetTwoFactorEnabledAsync(user, false);
+            return RedirectToAction(nameof(Index), "Home");
         }
     }
 }
