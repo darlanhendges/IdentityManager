@@ -20,6 +20,12 @@ namespace IdentityManagerFrontEnd.Installers
                 opt.Password.RequireNonAlphanumeric = false;
                 opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
                 opt.Lockout.MaxFailedAccessAttempts = 2;
+                opt.SignIn.RequireConfirmedAccount = true;
+            });
+
+            services.ConfigureApplicationCookie(opt =>
+            {
+                opt.AccessDeniedPath = new PathString("/Home/AccessDenied");
             });
         }
     }

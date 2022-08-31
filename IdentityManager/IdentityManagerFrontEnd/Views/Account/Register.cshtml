@@ -4,7 +4,7 @@
 <h1 class="text-info">Register</h1>
 
 <form asp-controller="Account" asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" role="form">
-  
+
     <h4>Create a new account</h4>
     <hr />
 
@@ -42,6 +42,16 @@
         </div>
     </div>
 
+
+    <div class="form-group">
+        <label asp-for="RoleSelected" class="col-md-2"></label>
+        <div class="col-md-10">
+            <select asp-for="RoleSelected" class="form-control" asp-items="@Model.RoleList" onclick="form-control">
+                <option disabled selected>--Select Role--</option>
+            </select>
+        </div>
+    </div>
+
     <div class="form-group mt-3">
         <div class="col-md-1">
             <button type="submit" class="btn btn-success form-control">Register</button>
@@ -51,5 +61,7 @@
 </form>
 
 @section Scripts{
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

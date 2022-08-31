@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Net.WebSockets;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
@@ -22,11 +23,11 @@ namespace IdentityManagerFrontEnd.Controllers
 
 
         public AccountController(
-            UserManager<IdentityUser> userManager, 
-            SignInManager<IdentityUser> signInManager, 
-            ILogger<AccountController> logger, 
-            IEmailSender emailSender, 
-            RoleManager<IdentityRole> roleManager, 
+            UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager,
+            ILogger<AccountController> logger,
+            IEmailSender emailSender,
+            RoleManager<IdentityRole> roleManager,
             UrlEncoder urlEncoder)
         {
             _userManager = userManager;
@@ -43,10 +44,28 @@ namespace IdentityManagerFrontEnd.Controllers
         }
 
         [HttpGet]
-        public IActionResult Register(string returnUrl = null)
+        [AllowAnonymous]
+        public async Task<IActionResult> Register(string returnUrl = null)
         {
+            if (!await _roleManager.RoleExistsAsync("Admin"))
+            {
+                await _roleManager.CreateAsync(new IdentityRole("Admin"));
+                await _roleManager.CreateAsync(new IdentityRole("User"));
+            }
+
+            var listItems = new List<SelectListItem>();
+
+            listItems.Add(new SelectListItem("Admin", "Admin"));
+
+            listItems.Add(new SelectListItem("User", "User"));
+
             ViewData["ReturnUrl"] = returnUrl;
-            var registerViewModel = new RegisterViewModel();
+
+            var registerViewModel = new RegisterViewModel()
+            {
+                RoleList = listItems
+            };
+
             return View(registerViewModel);
         }
 
@@ -63,9 +82,22 @@ namespace IdentityManagerFrontEnd.Controllers
 
                 if (result.Succeeded)
                 {
+                    if (!string.IsNullOrEmpty(model.RoleSelected) && model.RoleSelected.ToLower() == "admin")
+                    {
+                        await _userManager.AddToRoleAsync(user, "Admin");
+                    }
+                    else
+                    {
+                        await _userManager.AddToRoleAsync(user, "User");
+
+                    }
+
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
                     var callbakckUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code, returnUrl = returnUrl }, protocol: HttpContext.Request.Scheme);
+
                     await _emailSender.SendEmailAsync(model.Email, "Confirm your account - Identity Manager", $"Please confirm your account by clicking here: <a href=\"{callbakckUrl}\">link</a>");
+
                     _logger.LogInformation("Created a register user's code {0}", callbakckUrl);
 
                     return RedirectToAction("PendingConfirmEmail");
@@ -86,6 +118,7 @@ namespace IdentityManagerFrontEnd.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult PendingConfirmEmail()
         {
             return View();
@@ -143,6 +176,10 @@ namespace IdentityManagerFrontEnd.Controllers
                 {
                     return RedirectToAction(nameof(VerifyAuthenticatorCode), new { returnUrl, model.RememberMe });
                 }
+                if (result.IsNotAllowed)
+                {
+                    return View("NotAllowed");
+                }
                 if (result.IsLockedOut)
                 {
                     return View("Lockout");
@@ -156,6 +193,13 @@ namespace IdentityManagerFrontEnd.Controllers
 
 
             return View(model);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult NotAllowed()
+        {
+            return View();
         }
 
         [HttpGet]
@@ -303,17 +347,6 @@ namespace IdentityManagerFrontEnd.Controllers
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
-
-                    var roleExists = await _roleManager.RoleExistsAsync("User");
-                    if (!roleExists)
-                    {
-                        var resultCreateRole = await _roleManager.CreateAsync(new IdentityRole("User"));
-                        if (!resultCreateRole.Succeeded)
-                        {
-                            return View("Error");
-                        }
-                    }
-
                     await _userManager.AddToRoleAsync(user, "User");
                     result = await _userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
@@ -342,7 +375,7 @@ namespace IdentityManagerFrontEnd.Controllers
 
             string AuthenticatorUri = string.Format(AuthenticatorUriFormat, _urlEncoder.Encode("IdentityManager"),
                 _urlEncoder.Encode(user.Email), token);
-            
+
             var model = new TwoFactorAuthenticationViewModel() { Token = token, QRCodeUrl = AuthenticatorUri };
             return View(model);
         }
