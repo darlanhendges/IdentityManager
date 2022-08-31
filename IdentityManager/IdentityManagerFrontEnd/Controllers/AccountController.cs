@@ -10,6 +10,7 @@ using System.Text.Encodings.Web;
 
 namespace IdentityManagerFrontEnd.Controllers
 {
+    [Authorize]
     public class AccountController : Controller
     {
         private readonly UserManager<IdentityUser> _userManager;
@@ -50,6 +51,7 @@ namespace IdentityManagerFrontEnd.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
@@ -117,6 +119,7 @@ namespace IdentityManagerFrontEnd.Controllers
 
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Login(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
@@ -124,6 +127,7 @@ namespace IdentityManagerFrontEnd.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
@@ -155,11 +159,14 @@ namespace IdentityManagerFrontEnd.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult ForgotPassword()
         {
             return View();
         }
 
+        [HttpGet]
+        [AllowAnonymous]
         public IActionResult ForgotPasswordConfirmation()
         {
             return View();
@@ -229,6 +236,7 @@ namespace IdentityManagerFrontEnd.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [AllowAnonymous]
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
             var redirecturl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
@@ -420,6 +428,7 @@ namespace IdentityManagerFrontEnd.Controllers
             var user = await _userManager.GetUserAsync(User);
             await _userManager.ResetAuthenticatorKeyAsync(user);
             await _userManager.SetTwoFactorEnabledAsync(user, false);
+
             return RedirectToAction(nameof(Index), "Home");
         }
     }
