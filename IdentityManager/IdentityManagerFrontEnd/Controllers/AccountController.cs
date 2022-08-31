@@ -54,9 +54,7 @@ namespace IdentityManagerFrontEnd.Controllers
             }
 
             var listItems = new List<SelectListItem>();
-
             listItems.Add(new SelectListItem("Admin", "Admin"));
-
             listItems.Add(new SelectListItem("User", "User"));
 
             ViewData["ReturnUrl"] = returnUrl;
@@ -106,6 +104,10 @@ namespace IdentityManagerFrontEnd.Controllers
                 AddErrors(result);
             }
 
+            var listItems = new List<SelectListItem>();
+            listItems.Add(new SelectListItem("Admin", "Admin"));
+            listItems.Add(new SelectListItem("User", "User"));
+            model.RoleList = listItems;
             return View(model);
         }
 
