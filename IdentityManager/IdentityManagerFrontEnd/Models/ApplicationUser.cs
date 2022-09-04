@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -10,9 +11,12 @@ namespace IdentityManagerFrontEnd.Models
         public string Name { get; set; }
 
         [NotMapped]
-        public int RoleId { get; set; }
+        public string RoleId { get; set; }
 
         [NotMapped]
         public string Role { get; set; }
+
+        [NotMapped]
+        public IEnumerable<SelectListItem> RoleList { get; set; }
     }
 }
