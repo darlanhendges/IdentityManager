@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace IdentityManagerFrontEnd.Controllers
 {
@@ -34,7 +35,7 @@ namespace IdentityManagerFrontEnd.Controllers
             }
             else
             {
-                var obj = await _db.RoleClaims.FirstOrDefaultAsync(r => r.Id.Equals(id));
+                var obj = await _db.Roles.FirstOrDefaultAsync(r => r.Id.Equals(id));
                 return View(obj);
             }
         }
@@ -72,6 +73,31 @@ namespace IdentityManagerFrontEnd.Controllers
 
                 TempData[SD.Success] = "Role update successfully.";
             }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var roleFromDb = await _db.Roles.FirstOrDefaultAsync(r => r.Id.Equals(id));
+            if (roleFromDb == null)
+            {
+                TempData[SD.Error] = "Role not found.";
+                return RedirectToAction(nameof(Index));
+
+            }
+
+            var userRolesForThisRole = await _db.UserRoles.Where(r => r.RoleId.Equals(id)).CountAsync();
+            if (userRolesForThisRole > 0)
+            {
+                TempData[SD.Error] = "Cannot delete this role, since there are user assigned to this role.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            await _roleManager.DeleteAsync(roleFromDb);
+            TempData[SD.Success] = "Role deleted successfully.";
 
             return RedirectToAction(nameof(Index));
         }
