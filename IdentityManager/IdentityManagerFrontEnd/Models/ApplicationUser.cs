@@ -10,6 +10,9 @@ namespace IdentityManagerFrontEnd.Models
         [Required]
         public string Name { get; set; }
 
+        [Required]
+        public DateTime DateCreated { get; set; }
+
         [NotMapped]
         public string RoleId { get; set; }
 

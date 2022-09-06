@@ -11,6 +11,8 @@ DbInstaller.Install(builder.Services, builder.Configuration.GetConnectionString(
 
 IdentityInstaller.Install(builder.Services);
 
+PoliciesInstaller.Install(builder.Services);
+
 FacebookInstaller.Install(builder.Services, builder.Configuration.GetSection("Facebook").Get<FacebookOptions>());
 
 ServiceInstaller.Install(builder.Services);
@@ -35,7 +37,6 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 
 app.MapControllerRoute(

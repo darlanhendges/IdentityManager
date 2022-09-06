@@ -75,7 +75,7 @@ namespace IdentityManagerFrontEnd.Controllers
             returnUrl = returnUrl ?? Url.Content("~/");
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, Name = model.Name };
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, Name = model.Name, DateCreated = DateTime.Now };
                 var result = await _userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
