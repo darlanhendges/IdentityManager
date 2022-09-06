@@ -49,15 +49,15 @@ namespace IdentityManagerFrontEnd.Controllers
                 return NotFound();
             }
 
-            var userRole = await  _db.UserRoles.ToListAsync();
+            var userRole = await _db.UserRoles.ToListAsync();
             var roles = await _db.Roles.ToListAsync();
-            var role =  userRole.FirstOrDefault(u => u.UserId == objFromDb.Id);
+            var role = userRole.FirstOrDefault(u => u.UserId == objFromDb.Id);
 
             if (role != null)
             {
                 objFromDb.RoleId = roles.FirstOrDefault(u => u.Id == role.RoleId).Id;
             }
-          
+
             objFromDb.RoleList = _db.Roles.Select(u => new SelectListItem
             {
                 Text = u.Name,
@@ -105,9 +105,9 @@ namespace IdentityManagerFrontEnd.Controllers
         }
 
         [HttpPost]
-        public IActionResult LockUnlock(string userId)
+        public async Task<IActionResult> LockUnlock(string userId)
         {
-            var objFromDb = _db.ApplicationUser.FirstOrDefault(u => u.Id == userId);
+            var objFromDb = await _db.ApplicationUser.FirstOrDefaultAsync(u => u.Id == userId);
             if (objFromDb == null)
             {
                 return NotFound();
@@ -124,10 +124,24 @@ namespace IdentityManagerFrontEnd.Controllers
                 TempData[SD.Success] = "User locked successfully.";
             }
 
-            _db.SaveChanges();
-         
+            await _db.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Delete(string userId)
+        {
+            var objFromDb = await _db.ApplicationUser.FirstOrDefaultAsync(u => u.Id == userId);
+            if (objFromDb == null)
+            {
+                return NotFound();
+            }
+            _db.ApplicationUser.Remove(objFromDb);
+            await _db.SaveChangesAsync();
+
+            TempData[SD.Success] = "User deleted successfully.";
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
